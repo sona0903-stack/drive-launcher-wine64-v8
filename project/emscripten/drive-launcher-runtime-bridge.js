@@ -4,6 +4,9 @@
 
   const hash = new URLSearchParams((location.hash || "").replace(/^#/, ""));
   const TOKEN = hash.get("ddlToken") || "";
+  // This adapter belongs only to a token-bound launcher iframe.
+  // Keep the upstream standalone page and its boot smoke unchanged.
+  if (!TOKEN || parent === window) return;
   const queued = [];
   let draining = false;
 
