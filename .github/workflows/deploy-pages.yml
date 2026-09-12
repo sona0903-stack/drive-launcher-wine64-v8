@@ -24,7 +24,7 @@ name: Deploy wasm64 to Pages
 
 on:
   push:
-    branches: [master]
+    branches: [ddl-v8]
     # Only rebuild when something that affects the deployed site changes.
     paths:
       - "source/**"
@@ -58,6 +58,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ddl-v8
 
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
@@ -88,7 +90,7 @@ jobs:
           out="project/emscripten/Build/Wasm64Mt"
           echo "Downloading rootfs parts from release '$ROOTFS_RELEASE_TAG'..."
           gh release download "$ROOTFS_RELEASE_TAG" \
-            --repo "$GITHUB_REPOSITORY" \
+            --repo "andrewnakas/Boxedwine64" \
             --dir "$out" \
             --pattern '*.zip' \
             --pattern '*.zip.part*' \
@@ -156,6 +158,7 @@ jobs:
           # bare site URL lands on the wine64 page with chunked fetch enabled.
           cp "$src/wine64.html"            "$site/"
           cp "$src/wine64-launcher.js"     "$site/"
+          cp project/emscripten/drive-launcher-runtime-bridge.js "$site/"
           cp "$src/coi-serviceworker.js"   "$site/"
           cp "$src/boxedwine.css"          "$site/" 2>/dev/null || true
           cp "$src/boxedwine64.js"         "$site/"
@@ -229,3 +232,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
