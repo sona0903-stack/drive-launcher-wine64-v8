@@ -168,13 +168,13 @@ jobs:
           cp "$src"/*.zip.part*            "$site/" 2>/dev/null || true
           cp "$src"/*.manifest.json        "$site/"
           # Landing page: redirect "/" to the wine64 launcher with ?chunked=1 so
-          # the split rootfs is fetched + reassembled. ?p=notepad.exe gives a GUI
+          # the split rootfs is fetched + reassembled. ?p=clock.exe gives a GUI
           # out of the box; drop the query to get the bare `wine64 --version` boot.
           cat > "$site/index.html" <<'HTML'
           <!doctype html><meta charset="utf-8">
           <title>Boxedwine64 — wine64 in the browser</title>
-          <meta http-equiv="refresh" content="0; url=wine64.html?chunked=1&p=notepad.exe">
-          <p>Loading <a href="wine64.html?chunked=1&p=notepad.exe">wine64 in the browser</a>…</p>
+          <meta http-equiv="refresh" content="0; url=wine64.html?chunked=1&p=clock.exe">
+          <p>Loading <a href="wine64.html?chunked=1&p=clock.exe">wine64 in the browser</a>…</p>
           HTML
           # GitHub Pages strips dotfiles and won't serve _site as-is without this;
           # also disables Jekyll so files like coi-serviceworker.js pass through.
@@ -184,7 +184,7 @@ jobs:
       - name: Bundle same-origin Win32 runtime
         run: python3 tools/drive-launcher/prepare-win32.py
 
-      - name: Browser smoke test (boot notepad to first paint)
+      - name: Browser smoke test (boot clock to first paint)
         # Gate the deploy on the assembled site actually BOOTING in a real
         # browser: serve _site exactly as Pages will (chunked rootfs parts +
         # the same launcher), launch headless Chrome (preinstalled on
@@ -205,7 +205,7 @@ jobs:
             sleep 0.2
           done
           node project/emscripten/smoke-test.mjs \
-            "http://127.0.0.1:8077/wine64.html?chunked=1&p=notepad.exe&lazy=0" \
+            "http://127.0.0.1:8077/wine64.html?chunked=1&p=clock.exe&lazy=0" \
             --timeout=420000 --attempts=2
           rm -f _site/server.mjs
 
