@@ -20,14 +20,15 @@
   function canvasInfo() {
     const c = canvas();
     if (!c) return { width: 1024, height: 768 };
-    return { width: Number(c.width) || 1024, height: Number(c.height) || 768 };
+    const r=c.getBoundingClientRect(); return { width: Number(c.width) || 1024, height: Number(c.height) || 768, left:r.left, top:r.top, displayWidth:r.width, displayHeight:r.height };
   }
 
   function postReady() {
     const M = window.Module;
     let ready = false;
-    try { ready = !!(window.crossOriginIsolated && M && M.FS && M.ccall && M.ccall("bw64_session_ready", "number", [], []) === 1); } catch (_) {}
+    try { ready = location.pathname.includes("/win32/") ? !!window.isRunning : !!(window.crossOriginIsolated && M && M.FS && M.ccall && M.ccall("bw64_session_ready", "number", [], []) === 1); } catch (_) {}
     if (!ready) { send("DDL_RUNTIME_STATUS", {text: "Wine64 booting · isolated=" + window.crossOriginIsolated + " · " + (document.getElementById("status")?.textContent || "")}); return; }
+    if(document.getElementById("loading"))document.getElementById("loading").style.display="none";
     const c = canvasInfo();
     send("DDL_RUNTIME_BRIDGE_READY", { canvasWidth: c.width, canvasHeight: c.height });
   }
@@ -155,6 +156,7 @@
     drain();
   });
 
+  const fitStyle=document.createElement("style");fitStyle.textContent="body{margin:0!important;padding:0!important;background:#000} #dropzone{position:fixed;inset:0;display:grid;place-items:center;background:#000;z-index:3} #canvas{max-width:100vw;max-height:100vh;width:auto!important;height:auto!important} #loading{position:fixed;top:0;left:0;z-index:4;background:#172438;color:white}";document.head.appendChild(fitStyle);
   addEventListener("load", () => {
     setTimeout(postReady, 0);
     setInterval(() => {
