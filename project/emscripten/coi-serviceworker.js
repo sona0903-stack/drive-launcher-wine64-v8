@@ -57,6 +57,7 @@ if (typeof window === 'undefined') {
                         newHeaders.set("Cross-Origin-Resource-Policy", "cross-origin");
                     }
                     newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
+                    newHeaders.set("Document-Isolation-Policy", "isolate-and-require-corp");
 
                     return new Response(response.body, {
                         status: response.status,

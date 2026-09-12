@@ -24,6 +24,10 @@
   }
 
   function postReady() {
+    const M = window.Module;
+    let ready = false;
+    try { ready = !!(window.crossOriginIsolated && M && M.FS && M.ccall && M.ccall("bw64_session_ready", "number", [], []) === 1); } catch (_) {}
+    if (!ready) { send("DDL_RUNTIME_STATUS", {text: "Wine64 booting · isolated=" + window.crossOriginIsolated + " · " + (document.getElementById("status")?.textContent || "")}); return; }
     const c = canvasInfo();
     send("DDL_RUNTIME_BRIDGE_READY", { canvasWidth: c.width, canvasHeight: c.height });
   }
@@ -48,7 +52,7 @@
     const run64 = await waitFor("uploadAndRunExe", 360000);
     if (run64) {
       send("DDL_RUNTIME_STATUS", { text: "Win64 runtime received " + name });
-      run64(file);
+      await run64(file);
       return;
     }
 
@@ -159,6 +163,7 @@
     }, 2000);
   });
 
+  setInterval(postReady, 1000);
   if (document.readyState === "complete") postReady();
   else setTimeout(postReady, 500);
 })();
