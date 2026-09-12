@@ -59,7 +59,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ddl-v8
+          ref: ${{ github.sha }}
 
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14

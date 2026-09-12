@@ -52,6 +52,17 @@
     // Boxedwine64 bridge: exact public helper from wine64-launcher.js.
     const run64 = await waitFor("uploadAndRunExe", 360000);
     if (run64) {
+      // ZIP-backed guest directories need a writable MEMFS upload directory.
+      const fs = window.Module.FS;
+      try {
+        fs.mkdirTree("/root/home/username");
+        const probe = "/root/home/username/.ddl-write-probe";
+        fs.writeFile(probe, new Uint8Array([0]));
+        fs.unlink(probe);
+      } catch(e) {
+        throw new Error("Wine upload directory unavailable: errno=" + e.errno + " " + e.message);
+      }
+      console.log("DDL: upload directory ready; injecting " + name + " (" + file.size + " bytes)");
       send("DDL_RUNTIME_STATUS", { text: "Win64 runtime received " + name });
       await run64(file);
       return;
